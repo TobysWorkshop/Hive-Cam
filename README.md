@@ -1,9 +1,4 @@
-<!-- PROJECT LOGO -->
-<p align="center">
-  <a href="https://github.com/TobysWorkshop/Hive-Cam">
-    <img src="assets/logo.png" alt="Logo" width="100" height="100">
-  </a>
-  <h3 align="center">🎥 🐝 Hive-Cam 🐝🐝</h3>
+  <h1 align="center">🎥 🐝 Hive-Cam 🐝🐝</h1>
 
   <p align="center">
     This is Hive-Cam! A lightweight computer vision model for honeybee tracking and counting.
@@ -23,7 +18,7 @@
 
 ## 🐝 About the Project
 
-[![Hive-Cam Screen Shot][product-screenshot]](assets/screen1.png)
+![Hive-Cam Screen Shot](assets/screen1.png)
 
 Here you describe:
 - What your project does
@@ -36,7 +31,7 @@ Here you describe:
 - 👉 Hive-Cam will automatically identify, track, and count the bees as they fly in and out
 - 👉 See trends in bee foraging activity over time:
 
-[![Results][Results-screenshot]](assets/bee_counts_histogram.png)
+![Results](assets/bee_counts_histogram.png)
 
 ---
 
