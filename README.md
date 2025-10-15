@@ -13,7 +13,7 @@
 
 # 🐝 Table of Contents
 1. [About the Project](#-about-the-project)
-2. [Built With](#-built-with)
+2. [Built With](#%EF%B8%8F-built-with)
 
 ---
 
