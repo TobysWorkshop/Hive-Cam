@@ -7,29 +7,24 @@
   </p>
 </p>
 
+![Hive-Cam Screen Shot](assets/screen1.png)
+
 ---
 
-## 📝 Table of Contents
+## 🐝 Table of Contents
 1. [About the Project](#about-the-project)
 2. [Built With](#built-with)
-
 
 ---
 
 ## 🐝 About the Project
 
-![Hive-Cam Screen Shot](assets/screen1.png)
-
-Here you describe:
-- What your project does
-- Why it’s useful
-- The problem it solves
-- Any key features or highlights
+(WIP)
 
 ### ⚙️ Features
-- 👉 Upload a video of your hive entrance
-- 👉 Hive-Cam will automatically identify, track, and count the bees as they fly in and out
-- 👉 See trends in bee foraging activity over time:
+👉 Upload a video of your hive entrance
+👉 Hive-Cam will automatically identify, track, and count the bees as they fly in and out
+👉 See trends in bee foraging activity over time:
 
 ![Results](assets/bee_counts_histogram.png)
 
