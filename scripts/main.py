@@ -3,7 +3,9 @@ import os
 from tkinter import Tk, filedialog
 
 from generate_bboxes import bboxes_from_video
-from missed_count_box_tracker import track_bees_stepwise
+#from missed_count_box_tracker import track_bees_stepwise
+from missed_count_polygon_tracker import track_bees_stepwise
+from generate_entrances import generate_polygons
 
 
 ## -------------- VARIABLES ---------------- ##
@@ -60,6 +62,9 @@ if __name__ == "__main__":
 
     ## Generate and save bboxes
     get_bboxes(VIDEO_PATH)
+
+    ## Generate and save entrance polygons
+    generate_polygons(VIDEO_PATH)
 
     # Begin the tracking function
     track_bees_stepwise(VIDEO_PATH, YOLO_JSON_PATH, OUTPUT_DIR, generate_video=False)

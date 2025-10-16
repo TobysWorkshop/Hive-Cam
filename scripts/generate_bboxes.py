@@ -2,21 +2,15 @@
 print("[INFO] Importing dependencies... ", end="")
 
 import cv2
-import torch
 import numpy as np
 import json
 import os
-import sys
-import subprocess
-import math
 from ultralytics import YOLO
 
 print("completed.")
 
 
 # --- CONFIGURATION --- #
-VIDEO_NAME = "data/videos/videoB"  # no extension
-VIDEO_PATH = VIDEO_NAME + ".mp4"
 MODEL_PATH = 'weights/2000-lvl-model.pt'
 CONF_THRES = 0.25
 OUTPUT_DIR = "data"
@@ -24,9 +18,6 @@ OUTPUT_DIR = "data"
 # --- INITIALISE MODELS --- #
 print("[INFO] Initialising models... ", end="")
 model = YOLO(MODEL_PATH).to("cuda")
-
-video_depth_anything_path = os.path.join(os.path.dirname(__file__), "Video-Depth-Anything")
-sys.path.append(video_depth_anything_path)
 
 print("completed.")
 
