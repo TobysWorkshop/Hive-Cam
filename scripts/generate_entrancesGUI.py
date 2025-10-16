@@ -56,9 +56,16 @@ def expand_quad(pts, scale=1.05):
     pts = center + scale * (pts - center)
     return pts.reshape(4, 1, 2).astype(np.int32)
 
-def generate_polygons(video_path):
+
+
+# Create a safe output directory next to the exe or script
+out_dir = os.path.join(os.getcwd(), "output")
+os.makedirs(out_dir, exist_ok=True)
+
+
+def generate_polygons(video_path, weights_path):
     # Load YOLO segmentation model with custom weights
-    model = YOLO(WEIGHTS)
+    model = YOLO(weights_path)
     
     # Dictionary for per-object buffers (list of polys for averaging)
     buffers = {}
@@ -151,7 +158,7 @@ def generate_polygons(video_path):
     cap.release()
     
     # Save to JSON file
-    json_path = os.path.join(OUTPUT_DIR, 'polygons.json')
+    json_path = os.path.join(out_dir, 'polygons.json')
     with open(json_path, 'w') as f:
         json.dump(frame_data, f, indent=4)
     #print(f"[INFO] Saved entrance polygons to {json_path}")

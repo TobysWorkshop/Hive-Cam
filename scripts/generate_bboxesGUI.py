@@ -11,24 +11,28 @@ print("completed.")
 
 
 # --- CONFIGURATION --- #
-MODEL_PATH = 'weights/2000-lvl-model.pt'
+#MODEL_PATH = 'weights/2000-lvl-model.pt'
 CONF_THRES = 0.25
-OUTPUT_DIR = "data"
+#OUTPUT_DIR = "data"
 
-# --- INITIALISE MODELS --- #
-print("[INFO] Initialising models... ", end="")
-model = YOLO(MODEL_PATH).to("cuda")
-
-print("completed.")
+# Create a safe output directory next to the exe or script
+out_dir = os.path.join(os.getcwd(), "output")
+os.makedirs(out_dir, exist_ok=True)
 
 # --- YOLO BOUNDING BOXES --- #
 def bboxes_from_video(
     video_path,
-    out_dir=os.path.join(OUTPUT_DIR, "yolo_detections"),
+    model_path,
+    out_dir=os.path.join(out_dir, "yolo_detections"),
 ):
     """
     Runs YOLO on the input video and saves detections.
     """
+
+    # --- INITIALISE MODELS --- #
+    print("[INFO] Initialising models... ", end="")
+    model = YOLO(model_path).to("cuda")
+    print("completed.")
 
     os.makedirs(out_dir, exist_ok=True)
 

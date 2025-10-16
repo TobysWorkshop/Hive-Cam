@@ -1,0 +1,1 @@
+pyinstaller --onefile --windowed scripts/mainGUI.py --icon=bee.ico --add-data "assets/bee.ico;." --add-data "assets\;assets" --add-data "weights;weights"

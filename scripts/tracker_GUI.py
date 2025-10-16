@@ -8,6 +8,8 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import seaborn as sns
 from average_polygons import compute_average_polygon
+from PIL import Image, ImageTk
+import tkinter as tk
 
 OUTPUT_DIR = 'results'
 
@@ -145,14 +147,16 @@ def handle_missed_detection(tracks, centers, next_track_id):
     
     return assigned_tracks, new_tracks, next_track_id
 
-# --- Function to define hive entrance quadrilateral ---
-def define_hive_box(video_path):
+# --- Function to define hive entrance quadrilateral using Tkinter ---
+def define_hive_box(video_path, cap, tk_root=None):
+    from PIL import Image, ImageTk
+
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         print(f"Error: Cannot open video file {video_path}")
         return None
     
-    # Find first valid frame
+    # Grab the first valid frame
     frame_idx = 0
     while True:
         ret, frame = cap.read()
@@ -163,42 +167,108 @@ def define_hive_box(video_path):
             print("Error: No valid frames found in video")
             cap.release()
             return None
-    
-    points = []
-    def mouse_callback(event, x, y, flags, param):
-        if event == cv2.EVENT_LBUTTONDOWN:
-            points.append((x, y))
-            if len(points) <= 4:
-                print(f"[INFO] Corner {len(points)} selected: ({x}, {y}).")
-                if len(points) == 4:
-                    print("[INFO] All four corners selected. Press 'q' to confirm.")
-    
-    cv2.namedWindow("Select Hive Entrance")
-    cv2.setMouseCallback("Select Hive Entrance", mouse_callback)
-    print("[INPUT REQUIRED] Click four corners of the hive entrance quadrilateral in order (e.g., clockwise). Press 'q' to confirm or cancel.")
-    
-    while len(points) < 4 or cv2.getWindowProperty("Select Hive Entrance", cv2.WND_PROP_VISIBLE) > 0:
-        vis = frame.copy()
-        for i, pt in enumerate(points):
-            cv2.circle(vis, pt, 5, (0, 0, 255), -1)
-            if i > 0:
-                cv2.line(vis, points[i-1], pt, (0, 0, 255), 2)
-        if len(points) == 4:
-            cv2.line(vis, points[3], points[0], (0, 0, 255), 2)
-        cv2.imshow("Select Hive Entrance", vis)
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):
-            break
-    
     cap.release()
-    cv2.destroyAllWindows()
-    
-    if len(points) != 4:
-        print("Warning: Hive entrance quadrilateral not fully defined. Using default quadrilateral (center 50% of frame).")
+
+    # Convert frame to PIL image
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    image = Image.fromarray(frame_rgb)
+    photo = ImageTk.PhotoImage(image)
+
+    points = []
+
+    # Create selection window
+    window = tk.Toplevel(tk_root)
+    window.title("Select Hive Entrance")
+    canvas = tk.Canvas(window, width=photo.width(), height=photo.height())
+    canvas.pack()
+    canvas.photo = photo  # prevent garbage collection
+    canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+
+    info_label = tk.Label(window, text="Click four corners in order (e.g., clockwise).")
+    info_label.pack(pady=5)
+
+    def on_click(event):
+        if len(points) < 4:
+            points.append((event.x, event.y))
+            canvas.create_oval(event.x-3, event.y-3, event.x+3, event.y+3, fill='red')
+            if len(points) > 1:
+                canvas.create_line(points[-2][0], points[-2][1], points[-1][0], points[-1][1], fill='red', width=2)
+            if len(points) == 4:
+                canvas.create_line(points[3][0], points[3][1], points[0][0], points[0][1], fill='red', width=2)
+                info_label.config(text="All four corners selected. Press Confirm or Cancel.")
+
+    canvas.bind("<Button-1>", on_click)
+
+    result = tk.BooleanVar(value=False)
+
+    button_frame = tk.Frame(window)
+    button_frame.pack(pady=10)
+    tk.Button(button_frame, text="Confirm", command=lambda: [result.set(True), window.destroy()]).pack(side=tk.LEFT, padx=5)
+    tk.Button(button_frame, text="Cancel", command=lambda: [result.set(False), window.destroy()]).pack(side=tk.LEFT, padx=5)
+
+    tk_root.wait_window(window)
+
+    if result.get() and len(points) == 4:
+        return [np.array(p, dtype=float) for p in points]
+    else:
+        print("Warning: Hive entrance quadrilateral not fully defined. Using default quadrilateral.")
         h, w = frame.shape[:2]
-        points = [(w//4, h//4), (3*w//4, h//4), (3*w//4, 3*h//4), (w//4, 3*h//4)]
-    
-    return [np.array(p, dtype=float) for p in points]
+        return [np.array((w//4, h//4), dtype=float),
+                np.array((3*w//4, h//4), dtype=float),
+                np.array((3*w//4, 3*h//4), dtype=float),
+                np.array((w//4, 3*h//4), dtype=float)]
+
+
+# --- Function to confirm average polygon in Tkinter ---
+def confirm_average_polygon(video_path, average_polygon, tk_root):
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error: Cannot open video file {video_path}")
+        return None
+    frame_idx = 0
+    while True:
+        ret, frame = cap.read()
+        if ret:
+            break
+        frame_idx += 1
+        if frame_idx >= int(cap.get(cv2.CAP_PROP_FRAME_COUNT)):
+            print("Error: No valid frames found in video")
+            cap.release()
+            return None
+    vis = frame.copy()
+    avg_quad = [np.array(p, dtype=float) for p in average_polygon]
+    for i in range(4):
+        j = (i + 1) % 4
+        cv2.line(vis, tuple(map(int, avg_quad[i])), tuple(map(int, avg_quad[j])), (0, 0, 255), 2)
+    cap.release()
+
+    # Convert frame to PIL Image
+    vis_rgb = cv2.cvtColor(vis, cv2.COLOR_BGR2RGB)
+    h, w = vis.shape[:2]
+    max_height = 400  # Limit display size
+    if h > max_height:
+        scale = max_height / h
+        vis_rgb = cv2.resize(vis_rgb, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+    image = Image.fromarray(vis_rgb)
+    photo = ImageTk.PhotoImage(image)
+
+    # Create confirmation window
+    confirm_window = tk.Toplevel(tk_root)
+    confirm_window.title("Confirm Hive Entrance")
+    confirm_window.geometry(f"{photo.width()}x{photo.height()+80}")
+
+    result = tk.BooleanVar(value=False)
+    tk.Label(confirm_window, image=photo).pack(pady=10)
+    tk.Label(confirm_window, text="Does this entrance zone look correct? If not, you will be asked to select your own.").pack()
+    button_frame = tk.Frame(confirm_window)
+    button_frame.pack(pady=10)
+    tk.Button(button_frame, text="Yes", command=lambda: [result.set(True), confirm_window.destroy()]).pack(side=tk.LEFT, padx=5)
+    tk.Button(button_frame, text="No", command=lambda: [result.set(False), confirm_window.destroy()]).pack(side=tk.LEFT, padx=5)
+
+    # Keep photo reference to prevent garbage collection
+    confirm_window.photo = photo
+    tk_root.wait_window(confirm_window)
+    return result.get()
 
 # --- Function to stabilize quadrilateral using feature matching ---
 def stabilize_quad(prev_frame, curr_frame, quad, generate_video=True):
@@ -353,62 +423,32 @@ def plot_bee_counts(entry_timestamps, exit_timestamps, video_duration, output_di
     plt.close()
 
 # --- Main tracking function ---
-def track_bees_stepwise(video_path, yolo_json_path, entrance_json_path, output_dir, generate_video=False):
+def track_bees_stepwise(video_path, yolo_json_path, entrance_json_path, output_dir, generate_video=False, tk_root=None):
     # Compute average polygon
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error: Cannot open video file {video_path}")
+        return
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 10)
     average_polygon = compute_average_polygon(entrance_json_path)
     if average_polygon is None:
         print("Warning: Could not compute average polygon. Falling back to manual selection.")
-        hive_quad = define_hive_box(video_path)
+        hive_quad = define_hive_box(video_path, cap, tk_root)
         if hive_quad is None:
             print("Error: Could not define hive entrance quadrilateral. Exiting.")
+            cap.release()
             return
     else:
-        # Display average polygon on first frame for user confirmation
-        cap = cv2.VideoCapture(video_path)
-        if not cap.isOpened():
-            print(f"Error: Cannot open video file {video_path}")
-            return
-        # Find first valid frame
-        frame_idx = 0
-        while True:
-            ret, frame = cap.read()
-            if ret:
-                break
-            frame_idx += 1
-            if frame_idx >= int(cap.get(cv2.CAP_PROP_FRAME_COUNT)):
-                print("Error: No valid frames found in video")
-                cap.release()
-                return
-        
-        # Draw average polygon on frame
-        vis = frame.copy()
-        avg_quad = [np.array(p, dtype=float) for p in average_polygon]
-        for i in range(4):
-            j = (i + 1) % 4
-            cv2.line(vis, tuple(map(int, avg_quad[i])), tuple(map(int, avg_quad[j])), (0, 0, 255), 2)
-        cv2.putText(vis, "Is this entrance box correct? Press 'y' (yes) or 'n' (no)", 
-                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
-        
-        cv2.namedWindow("Confirm Hive Entrance")
-        cv2.imshow("Confirm Hive Entrance", vis)
-        print("[INPUT REQUIRED] Review the entrance box on the first frame. Press 'y' if correct, 'n' to select manually.")
-        
-        while True:
-            key = cv2.waitKey(0) & 0xFF
-            if key == ord('y') or key == ord('n'):
-                break
-        
-        cap.release()
-        cv2.destroyAllWindows()
-        
-        if key == ord('y'):
-            hive_quad = avg_quad
+        confirmed = confirm_average_polygon(video_path, average_polygon, tk_root)
+        if confirmed:
+            hive_quad = [np.array(p, dtype=float) for p in average_polygon]
             print("[INFO] User confirmed average polygon.")
         else:
             print("[INFO] User rejected average polygon. Falling back to manual selection.")
-            hive_quad = define_hive_box(video_path)
+            hive_quad = define_hive_box(video_path, cap, tk_root)
             if hive_quad is None:
                 print("Error: Could not define hive entrance quadrilateral. Exiting.")
+                cap.release()
                 return
     
     hive_quad_current = hive_quad
@@ -416,11 +456,6 @@ def track_bees_stepwise(video_path, yolo_json_path, entrance_json_path, output_d
     with open(yolo_json_path, "r") as f:
         all_detections = json.load(f)
     
-    # Initialize video capture for stabilization and optionally for video generation
-    cap = cv2.VideoCapture(video_path)
-    if not cap.isOpened():
-        print(f"Error: Cannot open video file {video_path}")
-        return
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = cap.get(cv2.CAP_PROP_FPS)
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -609,6 +644,7 @@ def track_bees_stepwise(video_path, yolo_json_path, entrance_json_path, output_d
         prev_num_dets = num_curr
         prev_frame = frame.copy() if ret else None
         frame_idx += 1
+        yield (frame_idx / total_frames * 100), None  # Yield progress percentage
     
     # Release video writer and capture
     if generate_video:
@@ -619,8 +655,12 @@ def track_bees_stepwise(video_path, yolo_json_path, entrance_json_path, output_d
     # Plot bee counts
     plot_bee_counts(entry_timestamps, exit_timestamps, video_duration, output_dir)
     
+    result = f"[RESULT] Final Bee Counts: In = {in_count}, Out = {out_count}"
+
     # Print final bee counts
-    print(f"[RESULT] Final Bee Counts: In = {in_count}, Out = {out_count}")
+    print(result)
+
+    yield 100.0, result
 
 if __name__ == "__main__":
     video_path = "data/videos/videoB.mp4"

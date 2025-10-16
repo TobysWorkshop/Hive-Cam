@@ -10,6 +10,7 @@ from generate_entrances import generate_polygons
 
 ## -------------- VARIABLES ---------------- ##
 YOLO_JSON_PATH = 'data/yolo_detections/bboxes.json'
+POLYGON_JSON_PATH = 'data/yolo_detections/polygons.json'
 OUTPUT_DIR = 'results'
 ## ----------------------------------------- ##
 
@@ -41,6 +42,10 @@ def get_bboxes(video_path):
     bboxes_from_video(video_path)
     print("completed. Bboxes saved to data/yolo_detections/bboxes.json")
 
+def get_entrance_polygons(video_path):
+    print("[INFO] Isolating hive entrances... ", end='')
+    generate_polygons(video_path)
+    print("completed. Polygons saved to data/yolo_detections/polygons.json")
 
 ## ----------------------------------------------------------------------------------------------- ##
 ## ----------------------------------- Main Function  -------------------------------------------- ##
@@ -48,6 +53,7 @@ def get_bboxes(video_path):
 
 if __name__ == "__main__":
     # Prompt user to select a video file
+    print("[INPUT REQUIRED] Select the input video for processing.")
     VIDEO_PATH = select_video_file()
     
     # Check if a file was selected
@@ -60,11 +66,13 @@ if __name__ == "__main__":
         print(f"[ERROR] Video file {VIDEO_PATH} does not exist. Exiting run.")
         sys.exit(1)
 
+    print("[INFO] Video loaded successfully.")
+
     ## Generate and save bboxes
     get_bboxes(VIDEO_PATH)
 
     ## Generate and save entrance polygons
-    generate_polygons(VIDEO_PATH)
+    get_entrance_polygons(VIDEO_PATH)
 
     # Begin the tracking function
-    track_bees_stepwise(VIDEO_PATH, YOLO_JSON_PATH, OUTPUT_DIR, generate_video=False)
+    track_bees_stepwise(VIDEO_PATH, YOLO_JSON_PATH, POLYGON_JSON_PATH, OUTPUT_DIR, generate_video=False)
