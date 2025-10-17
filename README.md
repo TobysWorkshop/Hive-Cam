@@ -115,13 +115,17 @@ Click the "Exit" button or the 'x' in the top right corner of the window to clos
 
 # 🗺️ Roadmap
 For initial release:
+
 - [x] Get YOLO-based bee detection off the ground
 - [x] Work out how to track bees across video frames effectively
 - [x] Develop a simple GUI and compile to a usable app
 - [x] Publish the GitHub repo
 - [ ] Write up project report for reference
+
 🥳🥳🥳
+
 For future development:
+
 - [ ] Test performance on a variety of contexts and hive-types
 - [ ] Add functionality to track different classes of honeybees (add 'pollen bee' and 'drone')
 - [ ] Attempt to optimise speed, particularly for longer video file integration
