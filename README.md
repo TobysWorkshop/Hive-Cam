@@ -96,7 +96,7 @@ The model will attempt to automatically select an appropriate box that fits over
 
 If you decide to select your own entrance box, select the four points of your desired box by clicking on the image where you want them to be. Make sure you select them in a circular order (e.g. top left, top right, bottom right, bottom left). If you're happy, click "Confirm" to use this as the entrance box. If you'd like to start again, click "Reset".
 
-![Run Track](assets/select_step.png)
+![Run Track](assets/select_step2.png)
 
 Once an entrance box has been defined, the model will start processing, and the two progress bars will begin to run one after another. The first, labelled "Detection", shows the progress as the model identifies bees and hive entrance regions in each individual video frame. The second, labelled "Tracking", shows the progress as the model then tracks those bees across the video frames. During this, you will see the status update in the "Status" box underneath.
 
