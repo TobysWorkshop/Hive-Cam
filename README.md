@@ -108,6 +108,9 @@ Once the model has finished processing, the results will be displayed on the rig
 
 The histogram is also saved as an image file in the app's output folder (app/output).
 
+You can then click the "Clear" button to remove all selections and results to start again.
+Click the "Exit" button or the 'x' in the top right corner of the window to close the app.
+
 ---
 
 # 🗺️ Roadmap
