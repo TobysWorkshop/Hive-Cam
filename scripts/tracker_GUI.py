@@ -172,44 +172,128 @@ def define_hive_box(video_path, cap, tk_root=None):
     # Convert frame to PIL image
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(frame_rgb)
-    photo = ImageTk.PhotoImage(image)
+
+    # Determine sensible display size
+    max_width = 800
+    max_height = 600
+    orig_w, orig_h = image.size
+    scale = min(max_width / orig_w, max_height / orig_h, 1.0)
+    display_w = int(orig_w * scale)
+    display_h = int(orig_h * scale)
+    if scale < 1.0:
+        disp_image = image.resize((display_w, display_h), Image.Resampling.LANCZOS)
+    else:
+        disp_image = image
+    photo = ImageTk.PhotoImage(disp_image)
 
     points = []
 
     # Create selection window
     window = tk.Toplevel(tk_root)
     window.title("Select Hive Entrance")
-    canvas = tk.Canvas(window, width=photo.width(), height=photo.height())
-    canvas.pack()
+    # Prevent very tiny windows on small screens
+    window.geometry(f"{display_w+20}x{display_h+120}")
+    window.resizable(False, False)
+
+    canvas = tk.Canvas(window, width=display_w, height=display_h)
+    canvas.pack(padx=10, pady=(10, 0))
     canvas.photo = photo  # prevent garbage collection
     canvas.create_image(0, 0, anchor=tk.NW, image=photo)
 
-    info_label = tk.Label(window, text="Click four corners in order (e.g., clockwise).")
-    info_label.pack(pady=5)
+    # Instruction label (exact requested text)
+    instruction_text = "Click on four points in a clockwise order to define the hive entrance. Press confirm when done or reset to try again"
+    info_label = tk.Label(window, text=instruction_text, wraplength=display_w, justify=tk.LEFT)
+    info_label.pack(pady=8)
+
+    # Keep references to drawn items so we can clear them on reset
+    drawn_point_ids = []
+    drawn_line_ids = []
+
+    def redraw_image():
+        # Clear all and redraw base image
+        canvas.delete("all")
+        canvas.create_image(0, 0, anchor=tk.NW, image=canvas.photo)
+        # redraw existing points/lines
+        for idx, (x, y) in enumerate(points):
+            pid = canvas.create_oval(x-3, y-3, x+3, y+3, fill='red', tags="pts")
+            drawn_point_ids.append(pid)
+            if idx > 0:
+                lid = canvas.create_line(points[idx-1][0], points[idx-1][1], x, y, fill='red', width=2, tags="lines")
+                drawn_line_ids.append(lid)
+        if len(points) == 4:
+            # close polygon
+            lid = canvas.create_line(points[3][0], points[3][1], points[0][0], points[0][1], fill='red', width=2, tags="lines")
+            drawn_line_ids.append(lid)
 
     def on_click(event):
+        # Only accept clicks within image bounds
+        if event.x < 0 or event.x > display_w or event.y < 0 or event.y > display_h:
+            return
         if len(points) < 4:
             points.append((event.x, event.y))
-            canvas.create_oval(event.x-3, event.y-3, event.x+3, event.y+3, fill='red')
+            # draw point
+            pid = canvas.create_oval(event.x-3, event.y-3, event.x+3, event.y+3, fill='red', tags="pts")
+            drawn_point_ids.append(pid)
+            # draw line from previous to current
             if len(points) > 1:
-                canvas.create_line(points[-2][0], points[-2][1], points[-1][0], points[-1][1], fill='red', width=2)
+                lid = canvas.create_line(points[-2][0], points[-2][1], points[-1][0], points[-1][1], fill='red', width=2, tags="lines")
+                drawn_line_ids.append(lid)
             if len(points) == 4:
-                canvas.create_line(points[3][0], points[3][1], points[0][0], points[0][1], fill='red', width=2)
-                info_label.config(text="All four corners selected. Press Confirm or Cancel.")
+                lid = canvas.create_line(points[3][0], points[3][1], points[0][0], points[0][1], fill='red', width=2, tags="lines")
+                drawn_line_ids.append(lid)
+                info_label.config(text="All four corners selected. Press Confirm to accept or Reset to try again.")
+        else:
+            # ignore clicks once 4 points selected (user should press reset)
+            info_label.config(text="Already have 4 points. Press Confirm or Reset.")
 
     canvas.bind("<Button-1>", on_click)
 
     result = tk.BooleanVar(value=False)
 
-    button_frame = tk.Frame(window)
-    button_frame.pack(pady=10)
-    tk.Button(button_frame, text="Confirm", command=lambda: [result.set(True), window.destroy()]).pack(side=tk.LEFT, padx=5)
-    tk.Button(button_frame, text="Cancel", command=lambda: [result.set(False), window.destroy()]).pack(side=tk.LEFT, padx=5)
+    # Button callbacks
+    def on_confirm():
+        if len(points) == 4:
+            result.set(True)
+            window.destroy()
+        else:
+            # Not enough points; update info label
+            info_label.config(text="Please select exactly four points in clockwise order before confirming.")
 
+    def on_reset():
+        points.clear()
+        # remove drawn items and redraw base image
+        canvas.delete("all")
+        canvas.create_image(0, 0, anchor=tk.NW, image=canvas.photo)
+        drawn_point_ids.clear()
+        drawn_line_ids.clear()
+        info_label.config(text=instruction_text)
+
+    def on_cancel():
+        result.set(False)
+        window.destroy()
+
+    button_frame = tk.Frame(window)
+    button_frame.pack(pady=8)
+    tk.Button(button_frame, text="Confirm", command=on_confirm, width=10).pack(side=tk.LEFT, padx=6)
+    tk.Button(button_frame, text="Reset", command=on_reset, width=10).pack(side=tk.LEFT, padx=6)
+    tk.Button(button_frame, text="Cancel", command=on_cancel, width=10).pack(side=tk.LEFT, padx=6)
+
+    # Keep photo reference to prevent garbage collection
+    window.photo = photo
+
+    # Wait for window to be closed
     tk_root.wait_window(window)
 
     if result.get() and len(points) == 4:
-        return [np.array(p, dtype=float) for p in points]
+        # Map back to original image coordinates
+        if scale == 0:
+            scale = 1.0
+        orig_points = []
+        for (x, y) in points:
+            ox = float(x) / scale
+            oy = float(y) / scale
+            orig_points.append(np.array((ox, oy), dtype=float))
+        return orig_points
     else:
         print("Warning: Hive entrance quadrilateral not fully defined. Using default quadrilateral.")
         h, w = frame.shape[:2]
@@ -649,8 +733,8 @@ def track_bees_stepwise(video_path, yolo_json_path, entrance_json_path, output_d
     # Release video writer and capture
     if generate_video:
         out.release()
+        cv2.destroyAllWindows()
     cap.release()
-    cv2.destroyAllWindows()
     
     # Plot bee counts
     plot_bee_counts(entry_timestamps, exit_timestamps, video_duration, output_dir)
@@ -662,18 +746,18 @@ def track_bees_stepwise(video_path, yolo_json_path, entrance_json_path, output_d
 
     yield 100.0, result
 
-if __name__ == "__main__":
-    video_path = "data/videos/videoB.mp4"
-    yolo_json_path = "data/yolo_detections/bboxes.json"
-    entrance_json_path = "data/yolo_detections/polygons.json"
-    output_dir = "results"
+#if __name__ == "__main__":
+    #video_path = "data/videos/videoB.mp4"
+    #yolo_json_path = "data/yolo_detections/bboxes.json"
+    #entrance_json_path = "data/yolo_detections/polygons.json"
+    #output_dir = "results"
 
     #import cProfile
     #import pstats
     #profile_output_file = "profiling_output.txt"
     #profiler = cProfile.Profile()
     #profiler.enable()
-    track_bees_stepwise(video_path, yolo_json_path, entrance_json_path, output_dir, generate_video=False)
+    #track_bees_stepwise(video_path, yolo_json_path, entrance_json_path, output_dir, generate_video=False)
     #profiler.disable()
     #with open(profile_output_file, 'w') as f:
     #    ps = pstats.Stats(profiler, stream=f)

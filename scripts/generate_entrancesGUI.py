@@ -5,8 +5,8 @@ import torch
 import json
 import os
 
-OUTPUT_DIR = "data/yolo_detections"
-WEIGHTS = 'weights/entrance.pt'
+#OUTPUT_DIR = "data/yolo_detections"
+#WEIGHTS = 'weights/entrance.pt'
 SAMPLE_RATE = 20 # Takes a detection every this number of frames. 
 
 def sort_quad_points(pts):
@@ -165,5 +165,5 @@ def generate_polygons(video_path, weights_path):
 
     yield 100.0
 
-if __name__ == "__main__":
-    generate_polygons('data/videos/videoB.mp4')
+#if __name__ == "__main__":
+#    generate_polygons('data/videos/videoB.mp4')

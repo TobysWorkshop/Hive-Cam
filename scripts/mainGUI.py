@@ -31,6 +31,7 @@ YOLO_JSON_PATH = os.path.join(out_dir, 'yolo_detections/bboxes.json')
 POLYGON_JSON_PATH = os.path.join(out_dir, 'polygons.json')
 OUTPUT_DIR = out_dir
 weights_path = resource_path("weights/2000-lvl-model.pt")
+polygon_path = resource_path("weights/entrance.pt")
 
 
 # Custom tooltip class
@@ -123,7 +124,7 @@ class BeeTrackingApp:
         browse_button.pack(side=tk.LEFT)
         ToolTip(browse_button, "Choose a video file to process")
 
-        ttk.Checkbutton(input_frame, text="Generate Video Output", variable=self.generate_video).pack(pady=5)
+        ttk.Checkbutton(input_frame, text="Generate Video Output (Takes longer to process)", variable=self.generate_video).pack(pady=5)
         ToolTip(input_frame.winfo_children()[-1], "Check to generate an output video with tracking visualizations")
 
         # Progress Frame
@@ -205,13 +206,13 @@ class BeeTrackingApp:
             print(f"[ERROR] Failed to generate bboxes: {str(e)}")
             return f"Error generating bboxes: {str(e)}"
 
-    def get_entrance_polygons(self, video_path, weights_path):
+    def get_entrance_polygons(self, video_path, polygon_path):
         """Generate and save entrance polygons."""
         self.status_text.set("Isolating hive entrances...")
         self.root.update()
         print("[INFO] Isolating hive entrances... ", end='')
         try:
-            for progress in generate_polygons(video_path, weights_path):
+            for progress in generate_polygons(video_path, polygon_path):
                 self.root.after(0, lambda p=progress: self.detection_progress.set(p))
             print("completed. Polygons saved to data/yolo_detections/polygons.json")
             return True
@@ -265,7 +266,7 @@ class BeeTrackingApp:
                 return
 
             # Generate entrance polygons
-            polygon_result = self.get_entrance_polygons(video_path, weights_path)
+            polygon_result = self.get_entrance_polygons(video_path, polygon_path)
             if polygon_result is not True:
                 self.root.after(0, lambda: messagebox.showerror("Error", polygon_result))
                 self.root.after(0, lambda: self.status_text.set("Failed to generate entrance polygons."))
