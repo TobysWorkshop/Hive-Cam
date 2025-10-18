@@ -35,6 +35,8 @@ The way Hive-Cam works is:
 
 ![Results](assets/bee_counts_histogram.png)
 
+Make sure you check out the [Attribution](#-attribution) section for personal usage requirements.
+
 ---
 
 # 🛠️ Built With
@@ -43,8 +45,6 @@ The way Hive-Cam works is:
 - [Python](https://www.python.org/)
 - [Grok](https://grok.com/)
 - [ChatGPT](https://chatgpt.com/)
-
-You may not use any part of this project or its code for commercial use. You may not redistribute this project or its code, modified or otherwise, in any way. Attribution is required for any use - See [Attribution](#-attribution).
 
 ---
 
