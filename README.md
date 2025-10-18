@@ -64,7 +64,7 @@ Now you can check out [how to use the App interface](#-how-to-use-the-app-interf
 ## 🗃 If you want to access/run the source files:
 If you want to access and run the source files, there are two ways you can download them:
 
-1. Use git clone.
+### 1. Use git clone.
 
 Make sure you have **[Git](https://git-scm.com/downloads)** installed.
 
@@ -78,7 +78,7 @@ git clone https://github.com/TobysWorkshop/Hive-Cam.git
 
 The repository should now be cloned and ready to use.
 
-2. Download the raw files from this page.
+### 2. Download the raw files from this page.
 
 At the top of this page, find the green button that says "< > Code". Click that and then select "Download ZIP". This will compress the raw files to a ZIP file and save it to your downloads folder. You will need to extract the files before you can use them (Windows: right-click -> "Extract All...").
 
@@ -147,7 +147,7 @@ For future development:
 So far, we have measured performance using a limited test set of two 30-second videos. The ground truth and model results are shown below for these two cases.
 
 | Test Video | Model count ENTERING | Model count EXITING | Ground truth ENTERING | Ground truth EXITING |
-|-----------|-----------|-----------|
+|-----------|-----------|-----------|-----------|-----------|
 | Video B | 23 | 18 | 24 | 19 |
 | Video A | 4 | 11 | 3 | 14 |
 
