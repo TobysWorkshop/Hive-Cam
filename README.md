@@ -17,7 +17,7 @@
 3. [How to use](#-how-to-use)
 4. [Roadmap](#%EF%B8%8F-roadmap)
 5. [Benchmarking and Performance](#-benchmarking-and-performance)
-6. [Attribution](#-attribution)
+6. [Attribution](#attribution)
 
 ---
 
@@ -35,7 +35,7 @@ The way Hive-Cam works is:
 
 ![Results](assets/bee_counts_histogram.png)
 
-Make sure you check out the [Attribution](#-attribution) section for personal usage requirements.
+Make sure you check out the [Attribution](#attribution) section if you're planning to use this project for yourself!
 
 ---
 
