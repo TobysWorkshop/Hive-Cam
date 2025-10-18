@@ -1,7 +1,7 @@
   <h1 align="center">🎥 🐝 Hive-Cam 🐝🐝</h1>
 
   <p align="center">
-    This is Hive-Cam! A lightweight computer vision model for honeybee tracking and counting.
+    This is Hive-Cam! A lightweight computer vision app and model for honeybee tracking and counting.
     Like a doorbell camera for your beehive, this model keeps track of how many bees are entering and exiting the hive entrance over time.
     <br />
   </p>
