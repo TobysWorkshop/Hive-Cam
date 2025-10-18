@@ -17,6 +17,7 @@
 3. [How to use](#-how-to-use)
 4. [Roadmap](#%EF%B8%8F-roadmap)
 5. [Benchmarking and Performance](#-benchmarking-and-performance)
+6. [Attribution](#-attribution)
 
 ---
 
@@ -42,6 +43,8 @@ The way Hive-Cam works is:
 - [Python](https://www.python.org/)
 - [Grok](https://grok.com/)
 - [ChatGPT](https://chatgpt.com/)
+
+You may not use any part of this project or its code for commercial use. You may not redistribute this project or its code, modified or otherwise, in any way. Attribution is required for any use - See [Attribution](#-attribution).
 
 ---
 
@@ -152,5 +155,18 @@ So far, we have measured performance using a limited test set of two 30-second v
 |-----------|-----------|-----------|-----------|-----------|
 | Video B | 23 | 18 | 24 | 19 |
 | Video A | 4 | 11 | 3 | 14 |
+
+---
+
+# Attribution
+You may not use any part of this project or its code for commercial use. You may not redistribute this project or its code, modified or otherwise, to another site or location in any way.
+
+If you use this project, please include one of the following citations or acknowledgments:
+
+> This project was developed by [Toby Davis](https://github.com/TobysWorkshop) as part of the Hive-Cam project.  
+> Source: [https://github.com/TobysWorkshop/Hive-Cam](https://github.com/TobysWorkshop/Hive-Cam)
+
+> Davis, T. (2025). Hive-Cam: Developing a citizen-science app to track honeybee foraging behaviour.  
+> GitHub Repository: https://github.com/TobysWorkshop/Hive-Cam
 
 ---
