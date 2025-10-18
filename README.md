@@ -83,7 +83,7 @@ The repository should now be cloned and ready to use.
 At the top of this page, find the green button that says "< > Code". Click that and then select "Download ZIP". This will compress the raw files to a ZIP file and save it to your downloads folder. You will need to extract the files before you can use them (Windows: right-click -> "Extract All...").
 
 ## 🤝 How to use the App interface
-When you open the app, you should get greeted with an interface like this:
+When you open the app, you should be greeted with an interface like this:
 
 ![App Interface](assets/start_step.png)
 
