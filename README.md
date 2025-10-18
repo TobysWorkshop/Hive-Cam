@@ -50,6 +50,8 @@ The way Hive-Cam works is:
 ## 📑 If you just want to use the App (recommended):
 To get started, you can download just the app and its files from this page to your computer. 
 
+Note that the app files are ~4GB in size.
+
 Click [HERE](https://download-directory.github.io/?url=https://github.com/TobysWorkshop/Hive-Cam/tree/main/app) to download just the app folder from this page. This will open a new window where the app files will be processed into a .zip file and downloaded to your computer.
 
 You will then need to unzip the folder (on Windows: locate it in your downloads folder, right-click the .zip file, and select "Extract All...").
