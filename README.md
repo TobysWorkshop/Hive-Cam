@@ -22,7 +22,7 @@
 ---
 
 # 🐝 About the Project
-Check out the project report: (Coming Soon!)
+**Check out the project report: [Here!](/assets/Hive_Cam_Report_2025.pdf)**
 
 This project seeks to develop and deploy a computer vision model that can be used by the general public to gather information about bee foraging activity in a variety of places, seasons, and contexts.
 The way Hive-Cam works is:
@@ -138,7 +138,7 @@ For initial release:
 - [x] Work out how to track bees across video frames effectively
 - [x] Develop a simple GUI and compile to a usable app
 - [x] Publish the GitHub repo
-- [ ] Write up project report for reference
+- [x] Write up project report for reference
 
 🥳🥳🥳
 
