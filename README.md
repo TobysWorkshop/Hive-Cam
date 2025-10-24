@@ -46,7 +46,8 @@ Make sure you check out the [Attribution](#attribution) section if you're planni
 - [Grok](https://grok.com/)
 - [ChatGPT](https://chatgpt.com/)
 - [Mendeley Data](https://data.mendeley.com/datasets/8gb9r2yhfc/6)
-  Sledevik, T. 2024. “Labeled dataset for bee detection and direction estimation on beehive landing boards”. Mendeley Data, V6. Available at https://data.mendeley.com/datasets/8gb9r2yhfc/6.
+
+  Sledevik, T. 2024. “Labeled dataset for bee detection and direction estimation on beehive landing boards”. Mendeley Data, V6.
 
 ---
 
